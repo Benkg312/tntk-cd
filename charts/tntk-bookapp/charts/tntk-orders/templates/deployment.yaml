@@ -36,39 +36,42 @@ spec:
           command: ["/bin/bash", "-c"]
           args: ["export SECRET_KEY=$(openssl rand -hex 32) && alembic upgrade head && uvicorn order.main:app --host 0.0.0.0 --port 8001 --reload"]
           env:
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: bookapp-secret
+                key: rds_connection_string
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: bookapp-external-secret
+                name: bookapp-secret
                 key: rds_username
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: bookapp-external-secret
+                name: bookapp-secret
                 key: rds_password
           - name: POSTGRES_DB
             valueFrom:
               secretKeyRef:
-                name: bookapp-external-secret
+                name: bookapp-secret
                 key: rds_db_name
           - name: POSTGRES_HOST
             valueFrom:
               secretKeyRef:
-                name: bookapp-external-secret
+                name: bookapp-secret
                 key: rds_endpoint
           - name: POSTGRES_PORT
             value: {{ .Values.postgresql.port | quote }}
-          - name: DATABASE_URL
-            value: "postgresql://{{ .Values.postgresql.username }}:{{ .Values.postgresql.password }}@{{ .Values.postgresql.host }}:{{ .Values.postgresql.port }}/{{ .Values.postgresql.database }}"
           - name: REDIS_HOST
             valueFrom:
               secretKeyRef:
-                name: bookapp-external-secret
+                name: bookapp-secret
                 key: redis_host
           - name: RABBITMQ_HOST
             valueFrom:
               secretKeyRef:
-                name: bookapp-external-secret
+                name: bookapp-secret
                 key: rabbitmq_host
           ports:
             - name: http
